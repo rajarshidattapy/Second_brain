@@ -1,168 +1,206 @@
-# MCP Starter for Puch AI
+# Echoself AI - The Reflective Personal Companion
 
-This is a starter template for creating your own Model Context Protocol (MCP) server that works with Puch AI. It comes with ready-to-use tools for job searching and image processing.
+**Echoself AI** is an intelligent, reflective personal companion that helps you understand your thoughts, emotions, and experiences through AI-powered memory storage, sentiment analysis, and personalized insights. Built as an MCP server compatible with **Puch AI** for seamless WhatsApp integration.
 
-## What is MCP?
+## 🌟 Features
 
-MCP (Model Context Protocol) allows AI assistants like Puch to connect to external tools and data sources safely. Think of it like giving your AI extra superpowers without compromising security.
+- **🧠 Memory Storage**: Store and retrieve text, voice messages, images, and links with semantic search
+- **💭 Sentiment Analysis**: Advanced mood and emotion detection with pattern analysis
+- **🤖 AI Reflections**: Gemini Pro-powered insights and reflective conversations
+- **⏰ Smart Reminders**: Natural language reminder parsing with WhatsApp notifications
+- **🔒 Privacy-First**: End-to-end encryption for all stored memories
+- **📱 WhatsApp Integration**: Seamless chat experience via Puch AI
+- **🎯 Vector Search**: Qdrant-powered semantic memory retrieval
 
-## What's Included in This Starter?
+## 🏗️ Architecture
 
-## Folders
+### Core Components
 
-- **[`mcp-bearer-token/`](./mcp-bearer-token/)**  
-  Example MCP servers using **Bearer token** auth (required by Puch AI). Includes:
-  - **[`mcp_starter.py`](./mcp-bearer-token/mcp_starter.py)**  
-    A minimal MCP server with:
-    - Text input/output tool (echo-style processing)
-    - Image input/output tool (e.g., convert to black & white)
-    - Bearer token validation
-  - **[`puch-user-id-mcp-example.py`](./mcp-bearer-token/puch-user-id-mcp-example.py)**  
-    A task management MCP server that demonstrates how to use `puch_user_id` (a unique, Puch-provided user identifier) to scope tasks and data per user.
+- **Memory Store** (`core/memory_store.py`): Qdrant vector database integration with encrypted storage
+- **LLM Client** (`core/llm_client.py`): Gemini Pro integration for reflections and insights
+- **Sentiment Analyzer** (`core/sentiment_analyzer.py`): Emotion and mood detection
+- **WhatsApp Handler** (`core/whatsapp_handler.py`): Puch AI integration with media processing
+- **Reminder System** (`core/reminder_system.py`): Natural language reminder scheduling
+- **Encryption** (`core/encryption.py`): AES encryption for sensitive data
 
-- **[`mcp-google-oauth/`](./mcp-google-oauth/)**  
-  Example MCP server showing how to implement **OAuth** with Google for MCP authentication/authorization.
+### Tech Stack
 
-- **[`mcp-oauth-github/`](./mcp-oauth-github/)**  
-  Example MCP server showing how to implement **OAuth** with GitHub for MCP authentication/authorization.
+- **Backend**: FastMCP (async MCP server framework)
+- **Vector DB**: Qdrant for semantic memory storage
+- **LLM**: Google Gemini Pro for reflections and insights
+- **Embeddings**: Sentence Transformers (`all-MiniLM-L6-v2`)
+- **STT**: OpenAI Whisper for voice message transcription
+- **Sentiment**: Transformers pipeline for emotion detection
+- **Encryption**: Cryptography library with AES
+- **Deployment**: Docker, Railway, Render support
 
-## Quick Setup Guide
+## 🚀 Quick Setup
 
-### Step 1: Install Dependencies
-
-First, make sure you have Python 3.11 or higher installed. Then:
+### 1. Clone and Install
 
 ```bash
-# Create virtual environment
-uv venv
-
-# Install all required packages
-uv sync
-
-# Activate the environment
-source .venv/bin/activate
+git clone <repository-url>
+cd echoself-ai
 ```
 
-### Step 2: Set Up Environment Variables
-
-Create a `.env` file in the project root:
-
+### 2. Install Dependencies
 ```bash
-# Copy the example file
+pip install -r requirements.txt
+```
+
+### 3. Environment Configuration
+
+Create `.env` file:
+```bash
 cp .env.example .env
 ```
 
-Then edit `.env` and add your details:
-
+Configure your environment variables:
 ```env
-AUTH_TOKEN=your_secret_token_here
+# Required
+AUTH_TOKEN=your_secret_bearer_token
 MY_NUMBER=919876543210
+GEMINI_API_KEY=your_gemini_api_key
+
+# Optional (defaults provided)
+QDRANT_URL=http://localhost:6333
+QDRANT_COLLECTION_NAME=echoself_memories
+EMBEDDING_MODEL=all-MiniLM-L6-v2
+WHISPER_MODEL=small
+ENCRYPTION_KEY=auto_generated_if_empty
 ```
 
-**Important Notes:**
-
-- `AUTH_TOKEN`: This is your secret token for authentication. Keep it safe!
-- `MY_NUMBER`: Your WhatsApp number in format `{country_code}{number}` (e.g., `919876543210` for +91-9876543210)
-
-### Step 3: Run the Server
+### 4. Start Qdrant Database
 
 ```bash
-cd mcp-bearer-token
-python mcp_starter.py
+# Using Docker Compose (recommended)
+docker-compose up -d qdrant
+
+# Or install Qdrant locally
+# See: https://qdrant.tech/documentation/quick-start/
 ```
 
-You'll see: `🚀 Starting MCP server on http://0.0.0.0:8086`
-
-### Step 4: Make It Public (Required by Puch)
-
-Since Puch needs to access your server over HTTPS, you need to expose your local server:
-
-#### Option A: Using ngrok (Recommended)
-
-1. **Install ngrok:**
-   Download from https://ngrok.com/download
-
-2. **Get your authtoken:**
-   - Go to https://dashboard.ngrok.com/get-started/your-authtoken
-   - Copy your authtoken
-   - Run: `ngrok config add-authtoken YOUR_AUTHTOKEN`
-
-3. **Start the tunnel:**
-   ```bash
-   ngrok http 8086
-   ```
-
-#### Option B: Deploy to Cloud
-
-You can also deploy this to services like:
-
-- Railway
-- Render
-- Heroku
-- DigitalOcean App Platform
-
-## How to Connect with Puch AI
-
-1. **[Open Puch AI](https://wa.me/+919998881729)** in your browser
-2. **Start a new conversation**
-3. **Use the connect command:**
-   ```
-   /mcp connect https://your-domain.ngrok.app/mcp your_secret_token_here
-   ```
-
-### Debug Mode
-
-To get more detailed error messages:
-
-```
-/mcp diagnostics-level debug
+### 5. Run the MCP Server
+```bash
+python mcp-bearer-token/echoself_mcp_server.py
 ```
 
-## Customizing the Starter
+## 🌐 Deployment
 
-### Adding New Tools
+### Railway (Recommended)
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
 
-1. **Create a new tool function:**
+# Deploy
+railway login
+railway up
+```
 
-   ```python
-   @mcp.tool(description="Your tool description")
-   async def your_tool_name(
-       parameter: Annotated[str, Field(description="Parameter description")]
-   ) -> str:
-       # Your tool logic here
-       return "Tool result"
+### Render
+```bash
+# Connect your GitHub repo to Render
+# Use the render.yaml configuration
+```
+
+### Docker
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
+```
+
+## 📱 Puch AI Integration
+
+### Connect to WhatsApp
+
+1. **Get your HTTPS URL** (from Railway, Render, or ngrok)
+2. **Open Puch AI**: https://wa.me/+919998881729
+3. **Connect your server**:
+   ```
+   /mcp connect https://your-server-url.com your_bearer_token
    ```
 
-2. **Add required imports** if needed
+### Available Commands
 
-## 📚 **Additional Documentation Resources**
+Once connected, you can:
 
-### **Official Puch AI MCP Documentation**
+- **Share thoughts**: Just send any message to store it with sentiment analysis
+- **Voice messages**: Send voice notes for automatic transcription and storage
+- **Ask for insights**: "What was I feeling last week?" or "Tell me about my mood patterns"
+- **Set reminders**: "Remind me to call mom tomorrow at 6pm"
+- **Search memories**: "What did I say about work stress?"
 
-- **Main Documentation**: https://puch.ai/mcp
-- **Protocol Compatibility**: Core MCP specification with Bearer & OAuth support
-- **Command Reference**: Complete MCP command documentation
-- **Server Requirements**: Tool registration, validation, HTTPS requirements
+## 🛠️ MCP Tools
 
-### **Technical Specifications**
+### Core Tools
 
-- **JSON-RPC 2.0 Specification**: https://www.jsonrpc.org/specification (for error handling)
-- **MCP Protocol**: Core protocol messages, tool definitions, authentication
+- **`validate`**: Required by Puch AI - returns your phone number
+- **`about`**: Get information about Echoself AI
+- **`store_message`**: Store any type of message with sentiment analysis
+- **`search_memories`**: Search and get AI-powered reflections
+- **`summarize_mood`**: Analyze mood patterns over time
+- **`set_reminder`**: Create reminders with natural language
+- **`get_reminders`**: View all active reminders
 
-### **Supported vs Unsupported Features**
+### Example Usage
 
-**✓ Supported:**
+```python
+# Store a message
+await store_message(
+    puch_user_id="user123",
+    content="Had a great day at the beach with friends!",
+    message_type="text"
+)
 
-- Core protocol messages
-- Tool definitions and calls
-- Authentication (Bearer & OAuth)
-- Error handling
+# Search for insights
+await search_memories(
+    puch_user_id="user123", 
+    query="How do I feel about work lately?",
+    limit=5
+)
 
-**✗ Not Supported:**
+# Set a reminder
+await set_reminder(
+    puch_user_id="user123",
+    content="Take vitamins",
+    time_text="every morning at 8am"
+)
+```
 
-- Videos extension
-- Resources extension
-- Prompts extension
+## 🔒 Privacy & Security
+
+- **End-to-end encryption**: All memories encrypted with AES
+- **Local processing**: Sentiment analysis runs locally
+- **Secure storage**: Qdrant vector database with encrypted payloads
+- **Bearer token auth**: Secure MCP authentication
+- **No data sharing**: Your memories stay private
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+Apache License 2.0 - see [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- **Puch AI Discord**: https://discord.gg/VMCnMvYx
+- **Puch AI Documentation**: https://puch.ai/mcp
+- **WhatsApp Support**: +91 99988 81729
+
+## 🏷️ Tags
+
+`#BuildWithPuch` `#EchoselfAI` `#MCP` `#WhatsApp` `#AI` `#PersonalCompanion` `#Reflection` `#Mood` `#Memory`
+
+---
+
+**Echoself AI** - Your reflective companion for understanding yourself better through AI-powered insights and memory. 🧠✨
+
 
 ## Getting Help
 

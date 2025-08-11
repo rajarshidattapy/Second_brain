@@ -1,0 +1,3 @@
+"""
+Echoself AI Core Module
+"""
