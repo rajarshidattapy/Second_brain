@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: echoself-mcp-server
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python mcp-bearer-token/echoself_mcp_server.py
+    envVars:
+      - key: AUTH_TOKEN
+        sync: false
+      - key: MY_NUMBER
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: QDRANT_URL
+        value: http://localhost:6333
+      - key: QDRANT_COLLECTION_NAME
+        value: echoself_memories
+      - key: EMBEDDING_MODEL
+        value: all-MiniLM-L6-v2
+      - key: WHISPER_MODEL
+        value: small
+      - key: DATA_DIR
+        value: ./data
+      - key: MCP_SERVER_HOST
+        value: 0.0.0.0
+      - key: MCP_SERVER_PORT
+        value: 8086
+
+  - type: pserv
+    name: qdrant-db
+    env: docker
+    dockerfilePath: ./deploy/Dockerfile.qdrant
+    disk:
+      name: qdrant-data
+      mountPath: /qdrant/storage
+      sizeGB: 1
